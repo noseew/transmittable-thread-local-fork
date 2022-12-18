@@ -133,8 +133,8 @@ public final class TtlRunnable implements Runnable, TtlWrapper<Runnable>, TtlEnh
 
         if (runnable instanceof TtlEnhanced) {
             // avoid redundant decoration, and ensure idempotency
-            if (idempotent) return (TtlRunnable) runnable;
-            else throw new IllegalStateException("Already TtlRunnable!");
+            if (idempotent) return (TtlRunnable) runnable; // 允许幂等
+            else throw new IllegalStateException("Already TtlRunnable!"); // 不允许重复包装
         }
         return new TtlRunnable(runnable, releaseTtlValueReferenceAfterRun);
     }

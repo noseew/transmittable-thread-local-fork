@@ -262,6 +262,10 @@ public class TransmittableThreadLocal<T> extends InheritableThreadLocal<T> {
     @Override
     public final T get() {
         T value = super.get();
+    /*
+     每次调用ttl的get方法，都会addThisToHolder，将当前ttl对象添加到全局变量holder中
+     这个时候，holder就拥有了项目中所有的ttl，
+    */
         if (disableIgnoreNullValueSemantics || value != null) addThisToHolder();
         return value;
     }
@@ -276,6 +280,10 @@ public class TransmittableThreadLocal<T> extends InheritableThreadLocal<T> {
             remove();
         } else {
             super.set(value);
+    /*
+     每次调用ttl的set方法，都会addThisToHolder，将当前ttl对象添加到全局变量holder中
+     这个时候，holder就拥有了项目中所有的ttl，
+    */
             addThisToHolder();
         }
     }
@@ -316,6 +324,23 @@ public class TransmittableThreadLocal<T> extends InheritableThreadLocal<T> {
                 }
             };
 
+    /*
+     每次调用ttl的set方法，都会addThisToHolder，将当前ttl对象添加到全局变量holder中
+     这个时候，holder就拥有了项目中所有的ttl，
+     为什么要将ttl存到holder中？
+        要想实现变量线程间传递，必须要确定两件事
+            1. 传递的动作谁来做？
+            2. 传递什么？
+        如果是纯自己实现线程间变量传递，则很好理解
+            1. 传递的动作由，重写线程池或runnable的代码来操作，这一步很简单这里忽略
+            2. 传的内容由用户显示指定，通常是全局变量容器（存放tl的容器），只要在容器内的变量，统统传递下去。使用者只需要将自己需要传递的东西注册到容器中即可
+        ttl如何解决上面两个问题呢？
+            1. 同上，没有区别
+            2. 有这个一个全局变量，就是holder；
+            但是注册进holder的动作变成了自动的，holder只保存ttl的实例，不考虑其他的tl实例，所以在用户使用ttl的时候，会自动注册到holder中
+     不会产生内存泄露吗？
+        holder中的ttl采用WeakHashMap存储，里面的Entry是一个所引用对象，只要发生GC就会回收
+    */
     @SuppressWarnings("unchecked")
     private void addThisToHolder() {
         if (!holder.get().containsKey(this)) {
