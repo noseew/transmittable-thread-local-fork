@@ -963,17 +963,27 @@ public class TransmittableThreadLocal<T> extends InheritableThreadLocal<T> imple
         }
 
         /**
+         * 注册{@link ThreadLocal}实例(包括子类{@link InheritableThreadLocal})来增强现有{@link ThreadLocal}实例的<b>Transmittable</b>能力。
+         *
          * Register the {@link ThreadLocal}(including subclass {@link InheritableThreadLocal}) instances
          * to enhance the <b>Transmittable</b> ability for the existed {@link ThreadLocal} instances.
          * <p>
+         * 使用影子复印机(直接传输引用)，如果需要不同的行为，应该使用方法{@link #registerThreadLocal(ThreadLocal, ttlcopyer)}显式传递一个定制的{@link ttlcopyer}。
+         *
          * Use the shadow copier(transmit the reference directly),
          * and should use method {@link #registerThreadLocal(ThreadLocal, TtlCopier)} to pass a customized {@link TtlCopier} explicitly
          * if a different behavior is desired.
          * <p>
+         * 如果注册的{@link ThreadLocal}实例是{@link TransmittableThreadLocal}则忽略并返回{@code true}。
+         * 因为{@link TransmittableThreadLocal}实例本身具有{@code Transmittable}能力，所以没有必要注册一个{@link TransmittableThreadLocal}实例。
+         *
          * If the registered {@link ThreadLocal} instance is {@link TransmittableThreadLocal} just ignores and return {@code true}.
          * since a {@link TransmittableThreadLocal} instance itself has the {@code Transmittable} ability,
          * it is unnecessary to register a {@link TransmittableThreadLocal} instance.
          * <p>
+         * 警告:
+         * 如果已注册的{@link ThreadLocal}实例不是{@link InheritableThreadLocal}，则该实例不能<b><i>{@code inherit}</i></b>值从父线程(aka。<b>可继承</b>能力)!
+         *
          * <B><I>Caution:</I></B><br>
          * If the registered {@link ThreadLocal} instance is not {@link InheritableThreadLocal},
          * the instance can NOT <B><I>{@code inherit}</I></B> value from parent thread(aka. the <b>inheritable</b> ability)!
